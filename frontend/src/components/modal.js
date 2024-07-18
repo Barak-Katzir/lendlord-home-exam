@@ -1,17 +1,11 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect } from "react";
 
-import './modal.css';
+import "./modal.css";
 
-function Modal({
-  closeModal,
-  displayModal,
-  id,
-  children
-}) {
-
+function Modal({ closeModal, displayModal, id, children }) {
   const handleKeyUp = useCallback(
-    e => {
-      if (e.key === 'Escape') {
+    (e) => {
+      if (e.key === "Escape") {
         closeModal();
       }
     },
@@ -19,28 +13,37 @@ function Modal({
   );
 
   useEffect(() => {
-    window.addEventListener('keyup', handleKeyUp);
-    return () => window.removeEventListener('keyup', handleKeyUp);
+    window.addEventListener("keyup", handleKeyUp);
+    return () => window.removeEventListener("keyup", handleKeyUp);
   }, [handleKeyUp]);
 
   const clickedOutside = () => {
-    closeModal()
+    closeModal();
   };
 
   const divStyle = {
-    display: displayModal ? 'block' : 'none'
+    display: displayModal ? "block" : "none",
   };
 
   return (
-    <div className="basic-modal" id={id} onClick={clickedOutside} style={divStyle}>
+    <div
+      className="basic-modal"
+      id={id}
+      onClick={clickedOutside}
+      style={divStyle}
+    >
       <div
-        className={'basic-modal-content'}
-        onClick={e => e.stopPropagation()}
+        className={"basic-modal-content"}
+        onClick={(e) => e.stopPropagation()}
       >
-        
-          <button type="button" className="close" aria-label="Close" onClick={closeModal}>
-            <span aria-hidden="true">&times;</span>
-          </button>
+        <button
+          type="button"
+          className="close"
+          aria-label="Close"
+          onClick={closeModal}
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
         {children}
       </div>
     </div>

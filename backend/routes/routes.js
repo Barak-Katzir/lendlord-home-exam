@@ -1,10 +1,14 @@
-const Router = require('koa-router')
-const router = new Router()
+const Router = require("koa-router");
+const router = new Router();
 
-const ctrl =  require('../controllers/users')
+const ctrl = require("../controllers/users");
 
-router.get('/user/:id', ctrl.getUserById)
+router.get("/user", ctrl.getAllUsers);
 
-router.allowedMethods()
+router.get("/user/:id", ctrl.getUserById);
 
-module.exports = router
+router.post("/user", ctrl.addUser);
+
+router.allowedMethods();
+
+module.exports = router;
