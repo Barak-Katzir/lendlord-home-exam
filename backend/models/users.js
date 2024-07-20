@@ -12,7 +12,11 @@ const schema = new mongoose.Schema(
     startDate: { type: String, required: true, trim: true },
     role: { type: String, required: true, trim: true },
     salaryAmount: { type: Number, required: true, trim: true },
-    selectedManager: { type: String, required: false, trim: true },
+    selectedManager: {
+      type: SchemaTypes.ObjectId,
+      required: false,
+      ref: "User",
+    },
   },
   { strict: false, autoCreate: true, timestamps: true }
 );

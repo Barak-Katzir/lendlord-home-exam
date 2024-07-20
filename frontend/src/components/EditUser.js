@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 import {
   TextField,
@@ -12,27 +12,28 @@ import {
   FormControl,
   InputLabel,
 } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import Snackbar from "@mui/material/Snackbar";
 import dayjs from "dayjs";
+var customParseFormat = require("dayjs/plugin/customParseFormat");
+dayjs.extend(customParseFormat);
 
-function AddUser(props) {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [startDate, setStartDate] = React.useState(dayjs("2024-07-18"));
-  const [role, setRole] = useState("Worker");
-  const [salaryAmount, setSalaryAmount] = useState("");
-  const [selectedManager, setSelectedManager] = useState(undefined);
+function EditUser(props) {
+  const user = props.user;
+  const [firstName, setFirstName] = useState(user.firstName);
+  const [lastName, setLastName] = useState(user.lastName);
+  const [email, setEmail] = useState(user.email);
+  const [startDate, setStartDate] = React.useState(
+    dayjs(user.startDate, "DD/MM/YYYY")
+  );
+  const [role, setRole] = useState(user.role);
+  const [salaryAmount, setSalaryAmount] = useState(user.salaryAmount);
+  const [selectedManager, setSelectedManager] = useState(user.selectedManager);
   const [open, setOpen] = React.useState(false);
   const [message, setMessage] = React.useState("");
-
-  useEffect(() => {
-    resetState();
-  }, []);
 
   const handleAlert = (message) => {
     setMessage(message);
@@ -44,7 +45,7 @@ function AddUser(props) {
     setOpen(false);
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
     if (
@@ -58,29 +59,29 @@ function AddUser(props) {
       handleAlert("Please fill out all fields.");
       return;
     }
-    props.addUser({
-      firstName,
-      lastName,
-      email,
-      startDate: startDate.format("DD/MM/YYYY"),
-      role,
-      salaryAmount,
-      selectedManager,
-    });
-    props.closeModal();
-    resetState();
-  };
 
-  function resetState() {
-    setFirstName("");
-    setLastName("");
-    setEmail("");
-    setStartDate(dayjs("2024-07-18"));
-    setRole("Worker");
-    setFirstName("");
-    setSalaryAmount("");
-    setSelectedManager(undefined);
-  }
+    try {
+      await props.editUser({
+        _id: user._id,
+        firstName,
+        lastName,
+        email,
+        startDate: startDate.format("DD/MM/YYYY"),
+        role,
+        salaryAmount,
+        selectedManager,
+      });
+
+      handleAlert("User updated successfully!");
+      props.closeModal();
+    } catch (error) {
+      console.error("Error updating user:", error);
+      handleAlert(
+        error.response?.data?.message ||
+          "An error occurred while updating the user"
+      );
+    }
+  };
 
   const handleRoleChange = (event) => {
     setRole(event.target.value);
@@ -103,7 +104,7 @@ function AddUser(props) {
             marginBottom: 2,
           }}
         >
-          Add New User
+          Edit User
         </Typography>
         <Box component="form" noValidate onSubmit={handleSubmit}>
           <Grid container spacing={2}>
@@ -174,7 +175,7 @@ function AddUser(props) {
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
-                error={salaryAmount.trim() === ""}
+                error={salaryAmount === ""}
                 required
                 fullWidth
                 id="salaryAmount"
@@ -191,7 +192,9 @@ function AddUser(props) {
                 fullWidth
                 required
                 error={
-                  role !== "Manager" && typeof selectedManager === "undefined"
+                  role !== "Manager" &&
+                  selectedManager &&
+                  selectedManager.trim() === ""
                 }
               >
                 <InputLabel id="selectedManager-label">Manager Name</InputLabel>
@@ -203,11 +206,13 @@ function AddUser(props) {
                   onChange={(e) => setSelectedManager(e.target.value)}
                   disabled={role === "Manager"}
                 >
-                  {props.users.map((user) => (
-                    <MenuItem key={user._id} value={user._id}>
-                      {user.firstName} {user.lastName}
-                    </MenuItem>
-                  ))}
+                  {props.users
+                    .filter((u) => u._id !== user._id && u.role === "Manager")
+                    .map((user) => (
+                      <MenuItem key={user._id} value={user._id}>
+                        {user.firstName} {user.lastName}
+                      </MenuItem>
+                    ))}
                 </Select>
               </FormControl>
             </Grid>
@@ -216,17 +221,17 @@ function AddUser(props) {
             <Button
               type="submit"
               variant="contained"
-              endIcon={<AddIcon />}
+              endIcon={<EditIcon />}
               sx={{ mt: 3, mb: 2 }}
             >
-              Add User
+              Save
             </Button>
           </Grid>
         </Box>
       </Box>
       <Snackbar
         open={open}
-        autoHideDuration={2500}
+        autoHideDuration={3000}
         onClose={closeAlert}
         message={message}
       />
@@ -234,4 +239,4 @@ function AddUser(props) {
   );
 }
 
-export default AddUser;
+export default EditUser;

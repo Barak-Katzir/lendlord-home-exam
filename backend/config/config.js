@@ -22,7 +22,7 @@ global.log = bunyan.createLogger({
 var config = {
   default: {
     database:
-      "mongodb+srv://baraak8:G8PXUZeA6fgLbVTH@cluster0.udm04r2.mongodb.net/workers?retryWrites=true&w=majority&appName=Cluster0",
+      "mongodb+srv://baraak8:YtL6hjBwnvmtNmQC@cluster0.udm04r2.mongodb.net/workers?retryWrites=true&w=majority&appName=Cluster0",
     appUrl: "http://localhost:3002",
     ports: {
       app: 3002,
